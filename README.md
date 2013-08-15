@@ -1,11 +1,9 @@
-Gasp! GCM for Android Demo Server
+Gasp! Apple Push Notification Service Demo Server
 ==================================================
 
-Push data synchronization server for Gasp! Android demo: uses CloudBees PaaS and Foxweave to provide automatic data sync between the Gasp! server database and Android SQLite on-device data stores. This version shows a standalone server app, with data sync triggered by a FoxWeave Integration Pipeline: the next version will be implemented as a FoxWeave Connector, obviating the need for a separate server deployment.
+Push data synchronization server for Gasp! iOS demo: uses CloudBees PaaS and Foxweave to provide automatic data sync between the Gasp! server database and iOS CoreData.
 
-The server uses [Google Cloud Messaging for Android](http://developer.android.com/google/gcm/index.html) to multicast Gasp! database updates to Android applications that register with the gasp-gcm-server application via simple HTTP calls (see GCMRegistration.java). The FoxWeave Integration service will call via WebHook the REST API exposed by DataSyncService.java, which it turn multicasts a GCM notification with the record id to registered devices.  The Android client can then call the Gasp! REST API to retrieve the review data and update its on-device database (see the gasp-gcm-client project for an example of how this works). The FoxWeave integration is currently set to poll the target database every minute, so for testing purposes you may want to trigger the pipeline manually to see the update notifications immediately.
-
-There is an example Android demo client project [gasp-gcm-client](https://github.com/mqprichard/gasp-gcm-client) on GitHub. You will need to make sure that you use the Google APIs Project Number that corresponds to the API key used to run this server application. 
+The server uses the [Apple Push Notification Service](http://developer.apple.com/library/mac/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW9) to broadcast Gasp! database update notifications to iOS applications that register with the gasp-apns-server via simple HTTP calls. The FoxWeave Integration service will call via WebHook the REST API exposed by DataSyncService.java, which it turn sends an APNS Push Notification with the record id to registered devices.  The iOS client can then call the Gasp! REST API to retrieve the review data and update its on-device database. The FoxWeave integration is currently set to poll the target database every minute, so for testing purposes you may want to trigger the pipeline manually to see the update notifications immediately.
 
 Setup
 -----
@@ -27,19 +25,44 @@ Setup
 }`
    - Data Mapping: `id->${id}, comment->${comment}` etc
 
-3. Configure Google APIs for Google Cloud Messaging
-   - Logon to [Google APIs Console](https://code.google.com/apis/console)
-   - Services -> Google Cloud Messaging for Android = ON
-   - API Access -> Simple API Access -> Key for server apps (note API Key)
-   - Overview (note 12-digit Project Number for Android client)
+3. Configure Provisioning Profiles and Certificates
+   - This [tutorial](http://www.raywenderlich.com/32960/apple-push-notification-services-in-ios-6-tutorial-part-1) explains the steps
+   - You will need an iOS Developer Program membership: create the provisioning profile and certificate using the [iOS Developer Portal](https://developer.apple.com/devcenter/ios/index.action)
+   - Export your Apple Development iOS Push Services certificate and private key as a .p12 keystore file
+   - Run the Xcode gasp-apns-client project on a connected device (included in the Provisioning Profile) and note the 64-digit device token.
 
 4. Deploy your FoxWeave Integration App on CloudBees and start it
 
-5. Build with: `mvn build install`
+5. Build this project with: `mvn build install`
+   - You will need to download the [javapns](https://code.google.com/p/javapns/) library and install it to your local Maven repository with 'mvn install:install-file -Dfile=JavaPNS_2.2.jar -DgroupId=com.google.code -DartifactId=javapns -Dversion=2.2 -Dpackaging=jar'
 
-6. Deploy to CloudBees: `bees app:deploy -a gasp-gcm-server target/gasp-gcm-server.war -P GCM_API_KEY=<your API key>`
+6. Deploy to CloudBees: `bees app:deploy -a gasp-apns-server target/gasp-apns-server.war -P APNS_TOKEN=<your device token> -P P12_PWD=<your p12 keystore password>`
+   - APNS_TOKEN should be the 64-digit device token
+   - P12_PWD should be the password for the p12 keystore containing your iOS Push Services certificate and private key
+
+7. To test the service: 'curl -H "Content-Type:application/json" -X POST http://gasp-apns-server.partnerdemo.cloudbees.net/reviews -d '{ "id":1, "comment":"blank", "star":"three", "restaurant_id":1, "user_id":1 }'
+
 
 Viewing the Server Log
 ----------------------
 
-You can view the server log using `bees app:tail -a gasp-gcm-server`
+You can view the server log using `bees app:tail -a gasp-apns-server` You should see output similar to this:
+'
+INFO  DataSyncService - Syncing Review Id: 1
+DEBUG DataSyncService - APNS Device Token: <64-digit token>
+DEBUG Payload - Adding alert [Gasp! Review Update]
+DEBUG ConnectionToAppleServer - Creating SSLSocketFactory
+DEBUG ConnectionToAppleServer - Creating SSLSocket to gateway.sandbox.push.apple.com:2195
+DEBUG PushNotificationManager - Initialized Connection to Host: [gateway.sandbox.push.apple.com] Port: [2195]: 639cc8fd[SSL_NULL_WITH_NULL_NULL: Socket[addr=gateway.sandbox.push.apple.com/17.172.233.65,port=2195,localport=47982]]
+DEBUG PushNotificationManager - Building Raw message from deviceToken and payload
+DEBUG PushNotificationManager - Built raw message ID 1 of total length 84
+DEBUG PushNotificationManager - Attempting to send notification: {"aps":{"alert":"Gasp! Review Update"}}
+DEBUG PushNotificationManager -   to device: <64-digit token>
+DEBUG PushNotificationManager - Flushing
+DEBUG PushNotificationManager - At this point, the entire 84-bytes message has been streamed out successfully through the SSL connection
+DEBUG PushNotificationManager - Notification sent on first attempt
+DEBUG PushNotificationManager - Reading responses
+DEBUG PushNotificationManager - Closing connection
+'
+
+
