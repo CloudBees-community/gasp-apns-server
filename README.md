@@ -28,12 +28,13 @@ Setup
 3. Configure Provisioning Profiles and Certificates
    - This [tutorial](http://www.raywenderlich.com/32960/apple-push-notification-services-in-ios-6-tutorial-part-1) explains the steps
    - You will need an iOS Developer Program membership: create the provisioning profile and certificate using the [iOS Developer Portal](https://developer.apple.com/devcenter/ios/index.action)
-   - Export your Apple Development iOS Push Services certificate and private key as a .p12 keystore file
+   - Export your Apple Development iOS Push Services certificate and private key as a p12 keystore file
    - Run the Xcode gasp-apns-client project on a connected device (included in the Provisioning Profile) and note the 64-digit device token.
 
 4. Deploy your FoxWeave Integration App on CloudBees and start it
 
 5. Build this project with: `mvn build install`
+   - Add your p12 keystore to src/main/webapp/WEB-INF/classes, default name: GaspApns.p12
    - You will need to download the [javapns](https://code.google.com/p/javapns/) library and install it to your local Maven repository with 'mvn install:install-file -Dfile=JavaPNS_2.2.jar -DgroupId=com.google.code -DartifactId=javapns -Dversion=2.2 -Dpackaging=jar'
 
 6. Deploy to CloudBees: `bees app:deploy -a gasp-apns-server target/gasp-apns-server.war -P APNS_TOKEN=<your device token> -P P12_PWD=<your p12 keystore password>`
