@@ -46,6 +46,7 @@ public class DataSyncService {
             Review review = new Gson().fromJson(jsonInput, Review.class);
             LOGGER.info("Syncing Review Id: " + String.valueOf(review.getId()));
 
+            //TODO: Retrieve all registered device tokens
             String token = Datastore.getTokens().get(0);
             LOGGER.debug("APNS Device Token: " + token);
 
@@ -64,13 +65,14 @@ public class DataSyncService {
     @Path("/restaurants")
     @Consumes(MediaType.APPLICATION_JSON)
     public void restaurantUpdateReceived(String jsonInput) {
-        Restaurant restaurant = new Gson().fromJson(jsonInput, Restaurant.class);
-        LOGGER.info("Syncing Restaurant Id: " + String.valueOf(restaurant.getId()));
-
-        String token = Datastore.getTokens().get(0);
-        LOGGER.debug("APNS Device Token: " + token);
-
         try {
+            Restaurant restaurant = new Gson().fromJson(jsonInput, Restaurant.class);
+            LOGGER.info("Syncing Restaurant Id: " + String.valueOf(restaurant.getId()));
+
+            //TODO: Retrieve all registered device tokens
+            String token = Datastore.getTokens().get(0);
+            LOGGER.debug("APNS Device Token: " + token);
+
             //TODO: Replace simple javapns call
             Push.alert("Gasp! Restaurants Update",
                     p12KeyStore,
@@ -86,13 +88,14 @@ public class DataSyncService {
     @Path("/users")
     @Consumes(MediaType.APPLICATION_JSON)
     public void userUpdateReceived(String jsonInput) {
-        User user = new Gson().fromJson(jsonInput, User.class);
-        LOGGER.info("Syncing User Id: " + String.valueOf(user.getId()));
-
-        String token = Datastore.getTokens().get(0);
-        LOGGER.debug("APNS Device Token: " + token);
-
         try {
+            User user = new Gson().fromJson(jsonInput, User.class);
+            LOGGER.info("Syncing User Id: " + String.valueOf(user.getId()));
+
+            //TODO: Retrieve all registered device tokens
+            String token = Datastore.getTokens().get(0);
+            LOGGER.debug("APNS Device Token: " + token);
+
             //TODO: Replace simple javapns call
             Push.alert("Gasp! Users Update",
                     p12KeyStore,
