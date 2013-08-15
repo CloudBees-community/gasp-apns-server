@@ -1,5 +1,5 @@
 Gasp! Apple Push Notification Service Demo Server
-==================================================
+-------------------------------------------------
 
 Push data synchronization server for Gasp! iOS demo: uses CloudBees PaaS and Foxweave to provide automatic data sync between the Gasp! server database and iOS CoreData.
 
@@ -48,22 +48,37 @@ Viewing the Server Log
 ----------------------
 
 You can view the server log using `bees app:tail -a gasp-apns-server` You should see output similar to this:
-'
+
+
 INFO  DataSyncService - Syncing Review Id: 1
+
 DEBUG DataSyncService - APNS Device Token: <64-digit token>
+
 DEBUG Payload - Adding alert [Gasp! Review Update]
+
 DEBUG ConnectionToAppleServer - Creating SSLSocketFactory
+
 DEBUG ConnectionToAppleServer - Creating SSLSocket to gateway.sandbox.push.apple.com:2195
+
 DEBUG PushNotificationManager - Initialized Connection to Host: [gateway.sandbox.push.apple.com] Port: [2195]: 639cc8fd[SSL_NULL_WITH_NULL_NULL: Socket[addr=gateway.sandbox.push.apple.com/17.172.233.65,port=2195,localport=47982]]
+
 DEBUG PushNotificationManager - Building Raw message from deviceToken and payload
+
 DEBUG PushNotificationManager - Built raw message ID 1 of total length 84
+
 DEBUG PushNotificationManager - Attempting to send notification: {"aps":{"alert":"Gasp! Review Update"}}
+
 DEBUG PushNotificationManager -   to device: <64-digit token>
+
 DEBUG PushNotificationManager - Flushing
+
 DEBUG PushNotificationManager - At this point, the entire 84-bytes message has been streamed out successfully through the SSL connection
+
 DEBUG PushNotificationManager - Notification sent on first attempt
+
 DEBUG PushNotificationManager - Reading responses
+
 DEBUG PushNotificationManager - Closing connection
-'
+`
 
 
