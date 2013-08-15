@@ -74,9 +74,9 @@ public class DataSyncService {
             //TODO: Replace simple javapns call
             Push.alert("Gasp! Restaurants Update",
                     p12KeyStore,
-                    new Config().getP12Pwd(),
+                    config.getP12Pwd(),
                     false,
-                    token);
+                    config.getToken());
         } catch (Exception e) {
             return;
         }
@@ -96,9 +96,9 @@ public class DataSyncService {
             //TODO: Replace simple javapns call
             Push.alert("Gasp! Users Update",
                     p12KeyStore,
-                    new Config().getP12Pwd(),
+                    config.getP12Pwd(),
                     false,
-                    token);
+                    config.getToken());
         } catch (Exception e) {
             return;
         }
