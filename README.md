@@ -27,7 +27,7 @@ Setup
 
 3. Configure Provisioning Profiles and Certificates
    - This [tutorial](http://www.raywenderlich.com/32960/apple-push-notification-services-in-ios-6-tutorial-part-1) explains the steps
-   - You will need an iOS Developer Program membership: create the provisioning profile and certificate using the [iOS Developer Portal](https://developer.apple.com/devcenter/ios/index.action)
+   - Create the provisioning profile and certificate using the [iOS Developer Portal](https://developer.apple.com/devcenter/ios/index.action)
    - Export your Apple Development iOS Push Services certificate and private key as a p12 keystore file
    - Run the Xcode gasp-apns-client project on a connected device (included in the Provisioning Profile) and note the 64-digit device token.
 
