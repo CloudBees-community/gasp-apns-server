@@ -31,7 +31,7 @@ import java.util.List;
  */
 public final class Datastore {
 
-  private static final List<String> regIds = new ArrayList<String>();
+  private static final List<String> tokens = new ArrayList<String>();
   private static final Logger LOGGER = LoggerFactory.getLogger(Datastore.class.getName());
 
   private Datastore() {
@@ -41,41 +41,29 @@ public final class Datastore {
   /**
    * Registers a device.
    */
-  public static void register(String regId) {
-    LOGGER.debug("Registering " + regId);
-    synchronized (regIds) {
-      regIds.add(regId);
+  public static void register(String token) {
+    LOGGER.debug("Registering " + token);
+    synchronized (tokens) {
+      tokens.add(token);
     }
   }
 
   /**
    * Unregisters a device.
    */
-  public static void unregister(String regId) {
-    LOGGER.debug("Unregistering " + regId);
-    synchronized (regIds) {
-      regIds.remove(regId);
-    }
-  }
-
-  /**
-   * Updates the registration id of a device.
-   */
-  public static void updateRegistration(String oldId, String newId) {
-    LOGGER.debug("Updating " + oldId + " to " + newId);
-    synchronized (regIds) {
-      regIds.remove(oldId);
-      regIds.add(newId);
+  public static void unregister(String token) {
+    LOGGER.debug("Unregistering " + token);
+    synchronized (tokens) {
+      tokens.remove(token);
     }
   }
 
   /**
    * Gets all registered devices.
    */
-  public static List<String> getDevices() {
-    synchronized (regIds) {
-      return new ArrayList<String>(regIds);
+  public static List<String> getTokens() {
+    synchronized (tokens) {
+      return new ArrayList<String>(tokens);
     }
   }
-
 }

@@ -20,6 +20,7 @@ import com.cloudbees.gasp.model.Restaurant;
 import com.cloudbees.gasp.model.Review;
 import com.cloudbees.gasp.model.User;
 import com.google.gson.Gson;
+import javapns.Push;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,21 +28,35 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
+import java.io.InputStream;
 
 @Path("/")
 public class DataSyncService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSyncService.class.getName());
+    private final InputStream p12KeyStore = this.getClass()
+                                                .getClassLoader()
+                                                .getResourceAsStream("GaspApns.p12");
+    private static final Config config = new Config();
 
     @POST
     @Path("/reviews")
     @Consumes(MediaType.APPLICATION_JSON)
     public void reviewUpdateReceived(String jsonInput) {
-        Review review = new Gson().fromJson(jsonInput, Review.class);
-        LOGGER.info("Syncing Review Id: " + String.valueOf(review.getId()));
-
         try {
+            Review review = new Gson().fromJson(jsonInput, Review.class);
+            LOGGER.info("Syncing Review Id: " + String.valueOf(review.getId()));
 
+            String token = Datastore.getTokens().get(0);
+            LOGGER.debug("APNS Device Token: " + token);
+
+            //TODO: Replace simple javapns call
+            Push.alert("Gasp! Review Update",
+                    p12KeyStore,
+                    config.getP12Pwd(),
+                    false,
+                    config.getToken());
         } catch (Exception e) {
+            return;
         }
     }
 
@@ -52,9 +67,18 @@ public class DataSyncService {
         Restaurant restaurant = new Gson().fromJson(jsonInput, Restaurant.class);
         LOGGER.info("Syncing Restaurant Id: " + String.valueOf(restaurant.getId()));
 
-        try {
+        String token = Datastore.getTokens().get(0);
+        LOGGER.debug("APNS Device Token: " + token);
 
+        try {
+            //TODO: Replace simple javapns call
+            Push.alert("Gasp! Restaurants Update",
+                    p12KeyStore,
+                    new Config().getP12Pwd(),
+                    false,
+                    token);
         } catch (Exception e) {
+            return;
         }
     }
 
@@ -65,8 +89,18 @@ public class DataSyncService {
         User user = new Gson().fromJson(jsonInput, User.class);
         LOGGER.info("Syncing User Id: " + String.valueOf(user.getId()));
 
+        String token = Datastore.getTokens().get(0);
+        LOGGER.debug("APNS Device Token: " + token);
+
         try {
+            //TODO: Replace simple javapns call
+            Push.alert("Gasp! Users Update",
+                    p12KeyStore,
+                    new Config().getP12Pwd(),
+                    false,
+                    token);
         } catch (Exception e) {
+            return;
         }
     }
 }

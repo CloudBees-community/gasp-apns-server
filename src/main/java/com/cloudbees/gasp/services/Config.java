@@ -21,16 +21,18 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import java.io.FileInputStream;
-import java.util.Properties;
 
 public class Config implements ServletContextListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(Config.class.getName());
-    private static String key = "";
-    private static String envBuildSecretDir = null;
+    private static String p12Pwd;
+    private static String token;
 
-    public String getKey() {
-        return key;
+    public static String getP12Pwd() {
+        return p12Pwd;
+    }
+
+    public static String getToken() {
+        return token;
     }
 
     /**
@@ -42,31 +44,24 @@ public class Config implements ServletContextListener {
      * @param event
      */
     public void contextInitialized(ServletContextEvent event) {
-        // Get GCM_API_KEY from : 
         try {
-            // 1. Jenkins build secret plugin
-            if ((envBuildSecretDir = System.getenv("GCM_API_KEY_TEST")) != null) {
-                LOGGER.debug("Getting Build Secret from: " + envBuildSecretDir);
-                FileInputStream propFile = new FileInputStream(envBuildSecretDir + "/" + "gcm-api-key.env");
-                Properties p = new Properties(System.getProperties());
-                p.load(propFile);
-                System.setProperties(p);
-                key = System.getProperty("GCM_API_KEY");
-                LOGGER.debug("GCM_API_KEY (from Build Secret): " + System.getProperty("GCM_API_KEY"));
+            //TODO: (temporary fix) get device token for testing from environment
+            //TODO: Devices will register tokens from didRegisterForRemoteNotificationsWithDeviceToken
+            if ((token = System.getProperty("APNS_TOKEN")) != null) {
+                Datastore.register(token);
+                LOGGER.debug("APNS device token: " + token);
             }
-            // 2. System property
-            if ((key = System.getProperty("GCM_API_KEY")) != null) {
-                LOGGER.debug("GCM_API_KEY (from system property): " + key);
-            }
-
-            // 3. System environment
-            else if ((key = System.getenv("GCM_API_KEY")) != null){
-                LOGGER.debug("GCM_API_KEY (from system environment): " + key);
-            }
-
-            // Error: GCM_API_KEY not set
             else {
-                LOGGER.error("GCM_API_KEY not set");
+                LOGGER.error("APNS device token not set");
+            }
+
+
+            //TODO: tidy up and add Jenkins build secret support
+            if ((p12Pwd = System.getProperty("P12_PWD")) != null) {
+                LOGGER.debug("Loaded P12_PWD from system property");
+            }
+            else {
+                LOGGER.error("P12_PWD not set");
             }
         }
         catch (Exception e){
