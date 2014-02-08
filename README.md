@@ -35,7 +35,6 @@ Setup
 
 5. Build this project with: `mvn build install`
    - Add your p12 keystore to src/main/webapp/WEB-INF/classes, default name: GaspApns.p12
-   - You will need to download the [javapns](https://code.google.com/p/javapns/) library and install it to your local Maven repository with `mvn install:install-file -Dfile=JavaPNS_2.2.jar -DgroupId=com.google.code -DartifactId=javapns -Dversion=2.2 -Dpackaging=jar`
 
 6. Deploy to CloudBees: `bees app:deploy -a gasp-apns-server target/gasp-apns-server.war -P APNS_TOKEN=<your device token> -P P12_PWD=<your p12 keystore password>`
    - APNS_TOKEN should be the 64-digit device token
